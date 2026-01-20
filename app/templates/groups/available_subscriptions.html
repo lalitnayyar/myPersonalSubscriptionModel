@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Add Subscription to {{ group.name }} - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('groups.index') }}">Groups</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('groups.view', id=group.id) }}">{{ group.name }}</a></li>
+                <li class="breadcrumb-item active">Add Subscription</li>
+            </ol>
+        </nav>
+        <h1 class="h3">Add Subscription to {{ group.name }}</h1>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% set available = subscriptions|selectattr('group_id', 'none')|list %}
+        {% if available %}
+        <div class="list-group">
+            {% for sub in available %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ sub.name }}</strong>
+                    <span class="text-muted ms-2">{{ sub.currency }} {{ "%.2f"|format(sub.amount) }}/{{ sub.billing_cycle }}</span>
+                </div>
+                <form method="POST" action="{{ url_for('groups.add_subscription', id=group.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="subscription_id" value="{{ sub.id }}">
+                    <button type="submit" class="btn btn-sm btn-primary">Add to Group</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">All your subscriptions are already in groups.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

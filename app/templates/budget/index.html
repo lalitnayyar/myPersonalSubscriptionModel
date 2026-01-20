@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Budget Calendar - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3"><i class="bi bi-calendar3 me-2"></i>Budget Calendar</h1>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="{{ url_for('budget.index', month=prev_month, year=prev_year) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-chevron-left"></i> Previous
+    </a>
+    <h4 class="mb-0">{{ month_name }} {{ current_year }}</h4>
+    <a href="{{ url_for('budget.index', month=next_month, year=next_year) }}" class="btn btn-outline-secondary">
+        Next <i class="bi bi-chevron-right"></i>
+    </a>
+</div>
+
+<!-- Summary -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h6 class="opacity-75">This Month's Renewals</h6>
+                <h3>{{ currency }} {{ "%.2f"|format(monthly_total) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted">Monthly Recurring</h6>
+                <h3>{{ currency }} {{ "%.2f"|format(recurring_monthly) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar -->
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-bordered mb-0 calendar-table">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">Sun</th>
+                    <th class="text-center">Mon</th>
+                    <th class="text-center">Tue</th>
+                    <th class="text-center">Wed</th>
+                    <th class="text-center">Thu</th>
+                    <th class="text-center">Fri</th>
+                    <th class="text-center">Sat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in month_days %}
+                <tr>
+                    {% for day in week %}
+                    <td class="calendar-day {% if day == 0 %}empty{% endif %} {% if day == today.day and current_month == today.month and current_year == today.year %}today{% endif %}">
+                        {% if day != 0 %}
+                        <div class="day-number">{{ day }}</div>
+                        {% if day in renewals_by_day %}
+                        <div class="day-events">
+                            {% for sub in renewals_by_day[day] %}
+                            <a href="{{ url_for('subscriptions.view', id=sub.id) }}" class="badge bg-primary text-truncate d-block mb-1" style="max-width: 100%;" title="{{ sub.name }}">
+                                {{ sub.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.calendar-table td {
+    height: 100px;
+    vertical-align: top;
+    padding: 5px;
+}
+.calendar-table td.empty {
+    background: #f8f9fa;
+}
+.calendar-table td.today {
+    background: #e7f1ff;
+}
+.day-number {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.day-events .badge {
+    font-size: 0.7rem;
+    font-weight: normal;
+}
+</style>
+{% endblock %}

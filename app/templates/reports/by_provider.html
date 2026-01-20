@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Spending by Provider - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('reports.index') }}">Reports</a></li>
+                <li class="breadcrumb-item active">By Provider</li>
+            </ol>
+        </nav>
+        <h1 class="h3"><i class="bi bi-building me-2"></i>Spending by Provider</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Monthly Total: {{ currency }} {{ "%.2f"|format(total_monthly) }}</h5>
+                <p class="text-muted mb-0">Yearly: {{ currency }} {{ "%.2f"|format(total_yearly) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if report_data %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Provider</th>
+                <th class="text-center">Subscriptions</th>
+                <th class="text-end">Monthly</th>
+                <th class="text-end">Yearly</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in report_data %}
+            <tr>
+                <td>
+                    <strong>{{ data.provider.name if data.provider else 'No Provider' }}</strong>
+                    {% if data.provider and data.provider.website %}
+                    <a href="{{ data.provider.website }}" target="_blank" class="ms-2 small">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                    {% endif %}
+                </td>
+                <td class="text-center">{{ data.count }}</td>
+                <td class="text-end">{{ currency }} {{ "%.2f"|format(data.monthly_total) }}</td>
+                <td class="text-end">{{ currency }} {{ "%.2f"|format(data.yearly_total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot class="table-light">
+            <tr>
+                <th>Total</th>
+                <th class="text-center">{{ report_data|sum(attribute='count') }}</th>
+                <th class="text-end">{{ currency }} {{ "%.2f"|format(total_monthly) }}</th>
+                <th class="text-end">{{ currency }} {{ "%.2f"|format(total_yearly) }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <p class="text-muted mb-0">No data to display</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

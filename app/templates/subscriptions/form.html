@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Subscription - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('subscriptions.index') }}">Subscriptions</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if mode == 'edit' else 'Add New' }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">
+            <i class="bi bi-{% if mode == 'edit' %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+            {{ 'Edit' if mode == 'edit' else 'Add New' }} Subscription
+        </h1>
+    </div>
+</div>
+
+<form method="POST" class="needs-validation" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Basic Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Subscription Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                   value="{{ subscription.name if subscription else '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="provider_id" class="form-label">Provider</label>
+                            <select class="form-select" id="provider_id" name="provider_id">
+                                <option value="">Select Provider</option>
+                                {% for provider in providers %}
+                                <option value="{{ provider.id }}"
+                                        {% if subscription and subscription.provider_id == provider.id %}selected{% endif %}>
+                                    {{ provider.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="category_id" class="form-label">Category</label>
+                            <select class="form-select" id="category_id" name="category_id">
+                                <option value="">Select Category</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}"
+                                        {% if subscription and subscription.category_id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="subscription_type_id" class="form-label">Type/Tier</label>
+                            <select class="form-select" id="subscription_type_id" name="subscription_type_id">
+                                <option value="">Select Type</option>
+                                {% for sub_type in subscription_types %}
+                                <option value="{{ sub_type.id }}"
+                                        {% if subscription and subscription.subscription_type_id == sub_type.id %}selected{% endif %}>
+                                    {{ sub_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2">{{ subscription.notes if subscription else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-currency-dollar me-2"></i>Pricing</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="amount" class="form-label">Amount <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0"
+                                   value="{{ subscription.amount if subscription else '' }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="currency" class="form-label">Currency</label>
+                            <select class="form-select" id="currency" name="currency">
+                                {% for curr in supported_currencies %}
+                                <option value="{{ curr }}"
+                                        {% if (subscription and subscription.currency == curr) or (not subscription and curr == current_user.default_currency) %}selected{% endif %}>
+                                    {{ curr }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="billing_cycle" class="form-label">Billing Cycle</label>
+                            <select class="form-select" id="billing_cycle" name="billing_cycle">
+                                <option value="monthly" {% if subscription and subscription.billing_cycle == 'monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="yearly" {% if subscription and subscription.billing_cycle == 'yearly' %}selected{% endif %}>Yearly</option>
+                                <option value="one_time" {% if subscription and subscription.billing_cycle == 'one_time' %}selected{% endif %}>One-time</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if mode == 'edit' %}
+                    <div class="mb-3">
+                        <label for="price_change_reason" class="form-label">Reason for price change (if any)</label>
+                        <input type="text" class="form-control" id="price_change_reason" name="price_change_reason"
+                               placeholder="e.g., Annual increase, plan upgrade">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Dates & Renewal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                                   value="{{ subscription.start_date.strftime('%Y-%m-%d') if subscription else '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="next_renewal_date" class="form-label">Next Renewal Date</label>
+                            <input type="date" class="form-control" id="next_renewal_date" name="next_renewal_date"
+                                   value="{{ subscription.next_renewal_date.strftime('%Y-%m-%d') if subscription and subscription.next_renewal_date else '' }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="reminder_days" class="form-label">Reminder Days Before</label>
+                            <input type="number" class="form-control" id="reminder_days" name="reminder_days"
+                                   min="1" max="90" value="{{ subscription.reminder_days if subscription else 15 }}">
+                            <div class="form-text">Days before renewal to receive reminder</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" class="form-check-input" id="auto_renew" name="auto_renew"
+                                       {% if subscription and subscription.auto_renew %}checked{% elif not subscription %}checked{% endif %}>
+                                <label class="form-check-label" for="auto_renew">Auto-renew enabled</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trial Period -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Trial Period</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_trial" name="is_trial"
+                                       {% if subscription and subscription.is_trial %}checked{% endif %}
+                                       onchange="toggleTrialDate()">
+                                <label class="form-check-label" for="is_trial">This is a trial subscription</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3" id="trial_date_container"
+                             style="display: {% if subscription and subscription.is_trial %}block{% else %}none{% endif %}">
+                            <label for="trial_end_date" class="form-label">Trial End Date</label>
+                            <input type="date" class="form-control" id="trial_end_date" name="trial_end_date"
+                                   value="{{ subscription.trial_end_date.strftime('%Y-%m-%d') if subscription and subscription.trial_end_date else '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Payment & Group -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment & Group</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="payment_method_id" class="form-label">Payment Method</label>
+                        <select class="form-select" id="payment_method_id" name="payment_method_id">
+                            <option value="">Select Payment Method</option>
+                            {% for pm in payment_methods %}
+                            <option value="{{ pm.id }}"
+                                    {% if subscription and subscription.payment_method_id == pm.id %}selected{% endif %}>
+                                {{ pm.get_display_name() }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <a href="{{ url_for('payments.add') }}">+ Add payment method</a>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="group_id" class="form-label">Subscription Group</label>
+                        <select class="form-select" id="group_id" name="group_id">
+                            <option value="">No Group</option>
+                            {% for group in groups %}
+                            <option value="{{ group.id }}"
+                                    {% if subscription and subscription.group_id == group.id %}selected{% endif %}>
+                                {{ group.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <a href="{{ url_for('groups.add') }}">+ Create group</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Credentials -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-key me-2"></i>Account Credentials</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info small">
+                        <i class="bi bi-shield-lock me-1"></i>
+                        Credentials are encrypted and stored securely.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="account_email" class="form-label">Account Email</label>
+                        <input type="email" class="form-control" id="account_email" name="account_email"
+                               value="{{ account_email if account_email else '' }}"
+                               placeholder="email@example.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="account_username" class="form-label">Account Username</label>
+                        <input type="text" class="form-control" id="account_username" name="account_username"
+                               value="{{ account_username if account_username else '' }}"
+                               placeholder="username">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>
+                            {{ 'Save Changes' if mode == 'edit' else 'Add Subscription' }}
+                        </button>
+                        <a href="{{ url_for('subscriptions.index') }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleTrialDate() {
+    const isTrialChecked = document.getElementById('is_trial').checked;
+    const trialDateContainer = document.getElementById('trial_date_container');
+    trialDateContainer.style.display = isTrialChecked ? 'block' : 'none';
+}
+
+// Set default start date to today if adding new
+{% if not subscription %}
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').value = today;
+    document.getElementById('next_renewal_date').value = today;
+});
+{% endif %}
+</script>
+{% endblock %}

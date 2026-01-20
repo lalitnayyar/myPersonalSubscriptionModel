@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Yearly Budget - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('budget.index') }}">Budget</a></li>
+                <li class="breadcrumb-item active">Yearly Overview</li>
+            </ol>
+        </nav>
+        <h1 class="h3"><i class="bi bi-calendar-range me-2"></i>Yearly Budget Overview - {{ current_year }}</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h6 class="opacity-75">Yearly Total</h6>
+                <h3>{{ currency }} {{ "%.2f"|format(yearly_total) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted">Monthly Average</h6>
+                <h3>{{ currency }} {{ "%.2f"|format(monthly_average) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <canvas id="yearlyChart" height="100"></canvas>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th class="text-center">Renewals</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in months_data %}
+                    <tr>
+                        <td>{{ data.name }}</td>
+                        <td class="text-center">{{ data.count }}</td>
+                        <td class="text-end">{{ currency }} {{ "%.2f"|format(data.total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th>Total</th>
+                        <th class="text-center">{{ months_data|sum(attribute='count') }}</th>
+                        <th class="text-end">{{ currency }} {{ "%.2f"|format(yearly_total) }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('yearlyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ months_data|map(attribute='name')|list|tojson }},
+            datasets: [{
+                label: 'Monthly Spending ({{ currency }})',
+                data: {{ months_data|map(attribute='total')|list|tojson }},
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+});
+</script>
+{% endblock %}

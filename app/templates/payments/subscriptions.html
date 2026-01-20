@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ payment_method.name }} Subscriptions - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('payments.index') }}">Payment Methods</a></li>
+                <li class="breadcrumb-item active">{{ payment_method.name }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">
+            <i class="bi bi-credit-card me-2"></i>{{ payment_method.get_display_name() }}
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Subscriptions using this payment method</h5>
+            </div>
+            <div class="card-body">
+                {% if subscriptions %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Cycle</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sub in subscriptions %}
+                            <tr>
+                                <td>{{ sub.name }}</td>
+                                <td>{{ sub.currency }} {{ "%.2f"|format(sub.amount) }}</td>
+                                <td>{{ sub.billing_cycle|capitalize }}</td>
+                                <td>
+                                    <span class="badge bg-{% if sub.status == 'active' %}success{% else %}secondary{% endif %}">
+                                        {{ sub.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('subscriptions.view', id=sub.id) }}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No subscriptions are using this payment method.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Summary</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <span class="text-muted">Total Monthly:</span>
+                        <strong>{{ current_user.default_currency }} {{ "%.2f"|format(payment_method.get_total_monthly_amount(current_user.default_currency)) }}</strong>
+                    </li>
+                    <li>
+                        <span class="text-muted">Active Subscriptions:</span>
+                        <strong>{{ payment_method.get_subscriptions_count() }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

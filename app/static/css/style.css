@@ -1,0 +1,307 @@
+/* Subscription Manager - Custom Styles */
+
+/* Root Variables */
+:root {
+    --primary-color: #667eea;
+    --primary-dark: #5a6fd6;
+    --secondary-color: #764ba2;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-bg: #f8f9fa;
+    --dark-bg: #212529;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --card-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* General Styles */
+body {
+    background-color: var(--light-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar Customization */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.navbar {
+    box-shadow: var(--card-shadow);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    font-weight: 500;
+}
+
+/* Summary Cards */
+.card.border-start {
+    border-left-width: 4px !important;
+}
+
+/* Subscription Cards */
+.subscription-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.subscription-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Notification Badge */
+.notification-badge {
+    font-size: 0.65rem;
+    padding: 0.25em 0.5em;
+}
+
+/* Notification Dropdown */
+.notification-dropdown {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Calendar Styles */
+.calendar-table td {
+    height: 100px;
+    vertical-align: top;
+    padding: 8px;
+    width: 14.28%;
+}
+
+.calendar-table td.empty {
+    background-color: #f8f9fa;
+}
+
+.calendar-table td.today {
+    background-color: #e7f1ff;
+}
+
+.day-number {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #495057;
+}
+
+.day-events .badge {
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Report Cards */
+.report-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    color: inherit;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Flash Messages */
+.flash-messages {
+    position: relative;
+    z-index: 100;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 500;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #6a4190);
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    border-top: none;
+}
+
+/* Badge Styles */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+/* List Group */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+/* Credential Display */
+.credential-value {
+    font-family: monospace;
+    background-color: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Dark Mode Support */
+[data-bs-theme="dark"] {
+    --light-bg: #1a1d21;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] body {
+    background-color: var(--dark-bg);
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #2c3034;
+}
+
+[data-bs-theme="dark"] .footer {
+    background-color: #2c3034 !important;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .table-light {
+    --bs-table-bg: #2c3034;
+    --bs-table-border-color: #495057;
+}
+
+[data-bs-theme="dark"] .calendar-table td.empty {
+    background-color: #1a1d21;
+}
+
+[data-bs-theme="dark"] .calendar-table td.today {
+    background-color: #2c3e50;
+}
+
+[data-bs-theme="dark"] .credential-value {
+    background-color: #2c3034;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .calendar-table td {
+        height: 80px;
+        padding: 4px;
+    }
+
+    .day-events .badge {
+        font-size: 0.6rem;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+/* Utilities */
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .btn,
+    .footer {
+        display: none !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}

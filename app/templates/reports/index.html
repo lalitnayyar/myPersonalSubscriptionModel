@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3">
+            <i class="bi bi-bar-chart me-2"></i>Reports & Analytics
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('reports.by_category') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-tags text-primary" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">By Category</h5>
+                <p class="text-muted small mb-0">View spending grouped by subscription category</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('reports.by_provider') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-building text-success" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">By Provider</h5>
+                <p class="text-muted small mb-0">View spending grouped by service provider</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('reports.by_payment_method') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-credit-card text-warning" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">By Payment Method</h5>
+                <p class="text-muted small mb-0">View spending by card or bank account</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('reports.by_status') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-toggle-on text-info" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">By Status</h5>
+                <p class="text-muted small mb-0">Compare active vs inactive subscriptions</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('budget.index') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar3 text-danger" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Budget Calendar</h5>
+                <p class="text-muted small mb-0">View upcoming renewals in calendar format</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('budget.yearly') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-range text-secondary" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Yearly Overview</h5>
+                <p class="text-muted small mb-0">View spending across all months</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('budget.forecast') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up-arrow text-purple" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Forecast</h5>
+                <p class="text-muted small mb-0">Projected spending for next 6 months</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <a href="{{ url_for('reports.export_csv') }}" class="card h-100 text-decoration-none report-card">
+            <div class="card-body text-center">
+                <i class="bi bi-download text-dark" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Export CSV</h5>
+                <p class="text-muted small mb-0">Download all subscriptions as CSV</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.report-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

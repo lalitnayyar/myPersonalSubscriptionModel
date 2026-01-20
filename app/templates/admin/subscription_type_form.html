@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Subscription Type - Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.subscription_types') }}">Types</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if mode == 'edit' else 'Add' }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">{{ 'Edit' if mode == 'edit' else 'Add' }} Subscription Type</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ sub_type.name if sub_type else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="2">{{ sub_type.description if sub_type else '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Type' }}</button>
+                    <a href="{{ url_for('admin.subscription_types') }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

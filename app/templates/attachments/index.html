@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Attachments - {{ subscription.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('subscriptions.index') }}">Subscriptions</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('subscriptions.view', id=subscription.id) }}">{{ subscription.name }}</a></li>
+                <li class="breadcrumb-item active">Attachments</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3"><i class="bi bi-paperclip me-2"></i>Attachments</h1>
+            <a href="{{ url_for('attachments.upload', sub_id=subscription.id) }}" class="btn btn-primary">
+                <i class="bi bi-upload me-1"></i>Upload
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if attachments %}
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Uploaded</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attachments %}
+                <tr>
+                    <td><i class="bi bi-file-earmark me-2"></i>{{ att.original_filename }}</td>
+                    <td><span class="badge bg-secondary">{{ att.file_type }}</span></td>
+                    <td>{{ att.get_file_size_display() }}</td>
+                    <td>{{ att.uploaded_at.strftime('%b %d, %Y') }}</td>
+                    <td>{{ att.notes or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('attachments.download', id=att.id) }}" class="btn btn-sm btn-outline-primary">Download</a>
+                        <a href="{{ url_for('attachments.view', id=att.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">View</a>
+                        <form method="POST" action="{{ url_for('attachments.delete', id=att.id) }}" class="d-inline" onsubmit="return confirm('Delete this attachment?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-paperclip text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3">No attachments</h4>
+        <p class="text-muted">Upload receipts, invoices, or contracts for this subscription.</p>
+        <a href="{{ url_for('attachments.upload', sub_id=subscription.id) }}" class="btn btn-primary">Upload File</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

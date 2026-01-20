@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Create' }} Group - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('groups.index') }}">Groups</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if mode == 'edit' else 'Create' }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">{{ 'Edit' if mode == 'edit' else 'Create' }} Group</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Group Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ group.name if group else '' }}" required placeholder="e.g., Microsoft 365 Family">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional description">{{ group.description if group else '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Create Group' }}</button>
+                    <a href="{{ url_for('groups.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

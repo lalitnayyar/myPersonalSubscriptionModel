@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="h3 mb-4">
+            <i class="bi bi-person-circle me-2"></i>Profile Settings
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Account Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('auth.profile') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" value="{{ current_user.email }}" disabled>
+                        <div class="form-text">Email cannot be changed</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name"
+                               value="{{ current_user.full_name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="default_currency" class="form-label">Default Currency</label>
+                        <select class="form-select" id="default_currency" name="default_currency">
+                            {% for currency in supported_currencies %}
+                            <option value="{{ currency }}"
+                                    {% if currency == current_user.default_currency %}selected{% endif %}>
+                                {{ currency }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="email_alerts_enabled"
+                                   name="email_alerts_enabled" {% if current_user.email_alerts_enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="email_alerts_enabled">
+                                Enable Email Notifications
+                            </label>
+                        </div>
+                        <div class="form-text">Receive email reminders for upcoming renewals</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="dark_mode"
+                                   name="dark_mode" {% if current_user.dark_mode %}checked{% endif %}>
+                            <label class="form-check-label" for="dark_mode">
+                                Dark Mode
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-2"></i>Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-key me-2"></i>Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('auth.change_password') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current_password"
+                               name="current_password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password"
+                               name="new_password" required minlength="6">
+                        <div class="form-text">At least 6 characters</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm_password"
+                               name="confirm_password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-lock me-2"></i>Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Account Stats</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <strong>Member since:</strong>
+                        {{ current_user.created_at.strftime('%B %d, %Y') }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Last login:</strong>
+                        {% if current_user.last_login %}
+                        {{ current_user.last_login.strftime('%B %d, %Y at %H:%M') }}
+                        {% else %}
+                        Never
+                        {% endif %}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Active subscriptions:</strong>
+                        {{ current_user.get_active_subscriptions_count() }}
+                    </li>
+                    <li>
+                        <strong>Account type:</strong>
+                        {% if current_user.is_admin %}
+                        <span class="badge bg-primary">Admin</span>
+                        {% else %}
+                        <span class="badge bg-secondary">User</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

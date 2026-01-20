@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Spending Forecast - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('budget.index') }}">Budget</a></li>
+                <li class="breadcrumb-item active">Forecast</li>
+            </ol>
+        </nav>
+        <h1 class="h3"><i class="bi bi-graph-up-arrow me-2"></i>6-Month Spending Forecast</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h6 class="opacity-75">Total Forecast (6 months)</h6>
+                <h3>{{ currency }} {{ "%.2f"|format(total_forecast) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for data in forecast_data %}
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ data.month }}</h5>
+        <span class="badge bg-primary">{{ currency }} {{ "%.2f"|format(data.total) }}</span>
+    </div>
+    {% if data.subscriptions %}
+    <div class="card-body">
+        <div class="row">
+            {% for sub in data.subscriptions %}
+            <div class="col-md-4 mb-2">
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('subscriptions.view', id=sub.id) }}">{{ sub.name }}</a>
+                    <span>{{ sub.currency }} {{ "%.2f"|format(sub.amount) }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <p class="text-muted mb-0">No renewals scheduled</p>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

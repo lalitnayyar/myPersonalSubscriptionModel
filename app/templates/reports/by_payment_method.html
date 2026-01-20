@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Spending by Payment Method - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('reports.index') }}">Reports</a></li>
+                <li class="breadcrumb-item active">By Payment Method</li>
+            </ol>
+        </nav>
+        <h1 class="h3"><i class="bi bi-credit-card me-2"></i>Spending by Payment Method</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Monthly Total: {{ currency }} {{ "%.2f"|format(total_monthly) }}</h5>
+                <p class="text-muted mb-0">Yearly: {{ currency }} {{ "%.2f"|format(total_yearly) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if report_data %}
+<div class="row">
+    {% for data in report_data %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-{% if data.payment_method and data.payment_method.type == 'card' %}credit-card{% else %}bank{% endif %} me-2"></i>
+                <strong>{{ data.payment_method.get_display_name() if data.payment_method else 'No Payment Method' }}</strong>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Monthly</small>
+                        <h5>{{ currency }} {{ "%.2f"|format(data.monthly_total) }}</h5>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Yearly</small>
+                        <h5>{{ currency }} {{ "%.2f"|format(data.yearly_total) }}</h5>
+                    </div>
+                </div>
+                <h6>Subscriptions ({{ data.count }})</h6>
+                <ul class="list-unstyled mb-0">
+                    {% for sub in data.subscriptions[:5] %}
+                    <li><a href="{{ url_for('subscriptions.view', id=sub.id) }}">{{ sub.name }}</a> - {{ sub.currency }} {{ "%.2f"|format(sub.amount) }}</li>
+                    {% endfor %}
+                    {% if data.subscriptions|length > 5 %}
+                    <li class="text-muted">...and {{ data.subscriptions|length - 5 }} more</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <p class="text-muted mb-0">No data to display</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

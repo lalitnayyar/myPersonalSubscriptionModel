@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Providers - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+                <li class="breadcrumb-item active">Providers</li>
+            </ol>
+        </nav>
+        <h1 class="h3 mt-2"><i class="bi bi-building me-2"></i>Manage Providers</h1>
+    </div>
+    <a href="{{ url_for('admin.add_provider') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Provider
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Website</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for provider in providers %}
+                <tr>
+                    <td><strong>{{ provider.name }}</strong></td>
+                    <td>{% if provider.website %}<a href="{{ provider.website }}" target="_blank">{{ provider.website }}</a>{% else %}-{% endif %}</td>
+                    <td>{{ provider.category.name if provider.category else '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_provider', id=provider.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <form method="POST" action="{{ url_for('admin.delete_provider', id=provider.id) }}" class="d-inline" onsubmit="return confirm('Delete this provider?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+        </h1>
+        <p class="text-muted">Welcome back, {{ current_user.full_name }}!</p>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase mb-1">Active Subscriptions</div>
+                        <div class="h3 mb-0">{{ active_count }}</div>
+                    </div>
+                    <div class="text-primary opacity-50">
+                        <i class="bi bi-collection" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-start border-success border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase mb-1">Monthly Spend</div>
+                        <div class="h3 mb-0">{{ current_user.default_currency }} {{ "%.2f"|format(monthly_spend) }}</div>
+                    </div>
+                    <div class="text-success opacity-50">
+                        <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase mb-1">Yearly Estimate</div>
+                        <div class="h3 mb-0">{{ current_user.default_currency }} {{ "%.2f"|format(yearly_spend) }}</div>
+                    </div>
+                    <div class="text-warning opacity-50">
+                        <i class="bi bi-calendar3" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-start border-info border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase mb-1">Trial Subscriptions</div>
+                        <div class="h3 mb-0">{{ trial_count }}</div>
+                    </div>
+                    <div class="text-info opacity-50">
+                        <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Renewals -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Upcoming Renewals</h5>
+                <span class="badge bg-warning">Next 15 days</span>
+            </div>
+            <div class="card-body">
+                {% if upcoming_renewals %}
+                <div class="list-group list-group-flush">
+                    {% for sub in upcoming_renewals %}
+                    <a href="{{ url_for('subscriptions.view', id=sub.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ sub.name }}</h6>
+                            <small class="text-muted">
+                                {{ sub.next_renewal_date.strftime('%b %d, %Y') }}
+                                {% set days = sub.days_until_renewal() %}
+                                {% if days == 0 %}
+                                <span class="badge bg-danger">Today</span>
+                                {% elif days == 1 %}
+                                <span class="badge bg-warning">Tomorrow</span>
+                                {% else %}
+                                <span class="badge bg-info">{{ days }} days</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">
+                            {{ sub.currency }} {{ "%.2f"|format(sub.amount) }}
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">No upcoming renewals in the next 15 days</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('budget.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-calendar3 me-1"></i>View Calendar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Notifications -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Recent Notifications</h5>
+                {% if recent_notifications %}
+                <span class="badge bg-primary">{{ recent_notifications|length }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if recent_notifications %}
+                <div class="list-group list-group-flush">
+                    {% for notif in recent_notifications %}
+                    <div class="list-group-item d-flex align-items-start">
+                        <i class="bi {{ notif.get_icon() }} text-{{ notif.get_color() }} me-3 mt-1"></i>
+                        <div class="flex-grow-1">
+                            <p class="mb-1">{{ notif.message }}</p>
+                            <small class="text-muted">{{ notif.created_at.strftime('%b %d, %H:%M') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-bell-slash" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">No new notifications</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('notifications.index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-list me-1"></i>View All
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Spending by Category Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Spending by Category</h5>
+            </div>
+            <div class="card-body">
+                {% if category_spending %}
+                <canvas id="categoryChart" height="250"></canvas>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-pie-chart" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">No data to display</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Spending Trend -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Monthly Spending</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_history %}
+                <canvas id="monthlyChart" height="250"></canvas>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-graph-up" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2">No data to display</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('subscriptions.add') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Add Subscription
+                    </a>
+                    <a href="{{ url_for('payments.add') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-credit-card me-1"></i>Add Payment Method
+                    </a>
+                    <a href="{{ url_for('reports.export_csv') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-download me-1"></i>Export CSV
+                    </a>
+                    <a href="{{ url_for('reports.index') }}" class="btn btn-outline-info">
+                        <i class="bi bi-bar-chart me-1"></i>View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category Pie Chart
+    {% if category_spending %}
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_spending|map(attribute='name')|list|tojson }},
+            datasets: [{
+                data: {{ category_spending|map(attribute='amount')|list|tojson }},
+                backgroundColor: {{ category_spending|map(attribute='color')|list|tojson }},
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+
+    // Monthly Bar Chart
+    {% if monthly_history %}
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    new Chart(monthlyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_history|map(attribute='label')|list|tojson }},
+            datasets: [{
+                label: 'Monthly Spend ({{ current_user.default_currency }})',
+                data: {{ monthly_history|map(attribute='amount')|list|tojson }},
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '{{ current_user.default_currency }} ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

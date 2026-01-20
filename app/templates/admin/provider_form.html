@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Provider - Admin{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.providers') }}">Providers</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if mode == 'edit' else 'Add' }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">{{ 'Edit' if mode == 'edit' else 'Add' }} Provider</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ provider.name if provider else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="website" class="form-label">Website</label>
+                        <input type="url" class="form-control" id="website" name="website" value="{{ provider.website if provider else '' }}" placeholder="https://example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select class="form-select" id="category_id" name="category_id">
+                            <option value="">Select Category</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if provider and provider.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="logo" class="form-label">Logo</label>
+                        <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Provider' }}</button>
+                    <a href="{{ url_for('admin.providers') }}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

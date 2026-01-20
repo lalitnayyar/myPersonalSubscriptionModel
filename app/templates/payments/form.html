@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Payment Method - Subscription Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('payments.index') }}">Payment Methods</a></li>
+                <li class="breadcrumb-item active">{{ 'Edit' if mode == 'edit' else 'Add New' }}</li>
+            </ol>
+        </nav>
+        <h1 class="h3">
+            <i class="bi bi-{% if mode == 'edit' %}pencil{% else %}plus-lg{% endif %} me-2"></i>
+            {{ 'Edit' if mode == 'edit' else 'Add' }} Payment Method
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="card" {% if payment_method and payment_method.type == 'card' %}selected{% endif %}>Credit/Debit Card</option>
+                            <option value="bank" {% if payment_method and payment_method.type == 'bank' %}selected{% endif %}>Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ payment_method.name if payment_method else '' }}"
+                               placeholder="e.g., Chase Visa, Bank of America" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_four_digits" class="form-label">Last 4 Digits</label>
+                        <input type="text" class="form-control" id="last_four_digits" name="last_four_digits"
+                               value="{{ payment_method.last_four_digits if payment_method else '' }}"
+                               maxlength="4" pattern="\d{4}" placeholder="1234">
+                        <div class="form-text">Optional: for easy identification</div>
+                    </div>
+
+                    <div class="mb-3" id="expiry_container">
+                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                        <input type="month" class="form-control" id="expiry_date" name="expiry_date"
+                               value="{{ payment_method.expiry_date.strftime('%Y-%m') if payment_method and payment_method.expiry_date else '' }}">
+                        <div class="form-text">For cards only</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="is_default" name="is_default"
+                                   {% if payment_method and payment_method.is_default %}checked{% endif %}>
+                            <label class="form-check-label" for="is_default">Set as default payment method</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>{{ 'Save Changes' if mode == 'edit' else 'Add Payment Method' }}
+                        </button>
+                        <a href="{{ url_for('payments.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
