@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Subscription Management Application\n\nFeatures:\n- Multi-user authentication with Flask-Login\n- Subscription CRUD with status management\n- Payment methods tracking\n- Category and provider management\n- Budget calendar and forecasting\n- Reports by category, provider, payment method\n- Notification system for renewals\n- Trial period tracking\n- Price history tracking\n- Secure credential storage \\(encrypted\\)\n- Document attachments system\n- Subscription groups/bundles\n- Dark mode support\n- Multi-currency support\n- Admin panel for managing categories, providers, types\n- Responsive Bootstrap 5 UI\n- Chart.js visualizations\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Subscription Management Application\n\nFeatures:\n- Multi-user authentication with Flask-Login\n- Subscription CRUD with status management\n- Payment methods tracking\n- Category and provider management\n- Budget calendar and forecasting\n- Reports by category, provider, payment method\n- Notification system for renewals\n- Trial period tracking\n- Price history tracking\n- Secure credential storage \\(encrypted\\)\n- Document attachments system\n- Subscription groups/bundles\n- Dark mode support\n- Multi-currency support\n- Admin panel for managing categories, providers, types\n- Responsive Bootstrap 5 UI\n- Chart.js visualizations\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
